@@ -1,71 +1,53 @@
-// Inicializa as 3 áreas de assinatura
-const signaturePads = [
-    new SignaturePad(document.getElementById('signaturePad1')),
-    new SignaturePad(document.getElementById('signaturePad2')),
-    new SignaturePad(document.getElementById('signaturePad3'))
-];
+// Configuração robusta para mobile
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializa os 3 pads de assinatura
+    const pads = [
+        new SignaturePad(document.getElementById('signaturePad1'), {
+            minWidth: 1,
+            maxWidth: 3,
+            penColor: '#000',
+            onBegin: () => disableScroll()
+        }),
+        new SignaturePad(document.getElementById('signaturePad2'), {
+            minWidth: 1,
+            maxWidth: 3,
+            penColor: '#000',
+            onBegin: () => disableScroll()
+        }),
+        new SignaturePad(document.getElementById('signaturePad3'), {
+            minWidth: 1,
+            maxWidth: 3,
+            penColor: '#000',
+            onBegin: () => disableScroll()
+        })
+    ];
 
-// Configuração das assinaturas
-signaturePads.forEach(pad => {
-    pad.minWidth = 1;
-    pad.maxWidth = 2;
-    pad.penColor = "black";
-});
-
-// Limpar assinatura específica
-function clearSignature(index) {
-    signaturePads[index - 1].clear();
-}
-
-// Preview da foto do cadeado
-document.getElementById('fotoCadeado').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = document.getElementById('photoPreview');
-            img.src = event.target.result;
-            img.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    // Impede que a página role ao assinar
+    function disableScroll() {
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            document.body.style.overflow = '';
+        }, 500);
     }
-});
 
-// Gerar PDF
-function gerarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    // Função para limpar assinaturas
+    window.clearSignature = (index) => {
+        pads[index - 1].clear();
+    };
 
-    // Cabeçalho
-    doc.setFontSize(16);
-    doc.text('ACORDO DE SEGURANÇA PARA LIBERAÇÃO DE SERVIÇO', 105, 15, null, null, 'center');
-
-    // Dados do formulário
-    doc.setFontSize(12);
-    doc.text(`Embarcação: ${document.getElementById('embarcacao').value}`, 14, 30);
-    doc.text(`Tanque(s): ${document.getElementById('tanque').value}`, 14, 40);
-
-    // Adiciona as 3 assinaturas
-    const roles = ['Chefe de Máquina', 'Encarregado de Serviço', 'Coordenador Navship'];
-    signaturePads.forEach((pad, index) => {
-        if (!pad.isEmpty()) {
-            const signatureData = pad.toDataURL();
-            doc.addImage(signatureData, 'PNG', 14, 80 + (index * 30), 60, 20);
-            doc.text(roles[index], 14, 75 + (index * 30));
-        }
-    });
-
-    // Adiciona foto do cadeado (se existir)
-    const fotoInput = document.getElementById('fotoCadeado');
-    if (fotoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            doc.addImage(e.target.result, 'JPEG', 14, 180, 60, 40);
-            doc.text('Foto do Cadeado:', 14, 175);
-            doc.save('acordo_seguranca.pdf');
-        };
-        reader.readAsDataURL(fotoInput.files[0]);
-    } else {
-        doc.save('acordo_seguranca.pdf');
+    // Ajusta o tamanho dos canvases
+    function resizeCanvases() {
+        pads.forEach(pad => {
+            const canvas = pad._canvas;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            pad.clear(); // Redesenha após redimensionamento
+        });
     }
-}
+
+    // Configurações responsivas
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+});
