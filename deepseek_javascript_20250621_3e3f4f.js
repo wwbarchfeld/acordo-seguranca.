@@ -1,0 +1,57 @@
+// Inicializa as áreas de assinatura
+const signaturePads = {
+    'signaturePad1': new SignaturePad(document.getElementById('signaturePad1')),
+    // Adicione mais se necessário
+};
+
+// Preview da foto do cadeado
+document.getElementById('fotoCadeado').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = document.getElementById('photoPreview');
+            img.src = event.target.result;
+            img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Limpar assinatura
+function clearSignature(canvasId) {
+    signaturePads[canvasId].clear();
+}
+
+// Gerar PDF
+function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Adiciona conteúdo ao PDF
+    doc.setFontSize(16);
+    doc.text('ACORDO DE SEGURANÇA PARA LIBERAÇÃO DE SERVIÇO', 105, 15, null, null, 'center');
+    
+    // Dados do formulário
+    doc.setFontSize(12);
+    doc.text(`Embarcação/Tanques: ${document.getElementById('embarcacao').value}`, 14, 30);
+    
+    // Adiciona assinaturas
+    Object.keys(signaturePads).forEach((key, index) => {
+        const signatureData = signaturePads[key].toDataURL();
+        doc.addImage(signatureData, 'PNG', 14, 100 + (index * 40), 60, 30);
+    });
+    
+    // Adiciona foto do cadeado se existir
+    const fotoInput = document.getElementById('fotoCadeado');
+    if (fotoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            doc.addImage(e.target.result, 'JPEG', 14, 180, 60, 40);
+            doc.save('acordo_seguranca.pdf');
+        };
+        reader.readAsDataURL(fotoInput.files[0]);
+    } else {
+        doc.save('acordo_seguranca.pdf');
+    }
+}
