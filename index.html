@@ -3,47 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Acordo de Segurança</title>
+    <title>Acordo de Segurança Elétrica</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .signature-container { margin-bottom: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .signature-container {
+            margin: 20px 0;
+        }
         .signature-pad {
             border: 1px solid #000;
             width: 100%;
             height: 150px;
-            touch-action: none; /* Essencial para mobile */
+            touch-action: none;
+            background: white;
         }
-        button { 
-            background: #1a73e8; 
-            color: white; 
-            border: none; 
-            padding: 10px; 
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        #photoPreview {
+            max-width: 100%;
+            margin-top: 10px;
+            display: none;
+            border: 1px dashed #ccc;
+        }
+        .clear-btn {
+            background: #f44336;
             margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- 3 Áreas de Assinatura Independentes -->
-    <div class="signature-container">
-        <label>Chefe de Máquina:</label>
-        <canvas id="signaturePad1" class="signature-pad"></canvas>
-        <button onclick="clearSignature(1)">Limpar</button>
-    </div>
+    <h1>ACORDO DE SEGURANÇA PARA LIBERAÇÃO DE SERVIÇO</h1>
+    
+    <form id="acordoForm">
+        <!-- Dados da Embarcação -->
+        <div class="form-group">
+            <label for="embarcacao">Nome da Embarcação:</label>
+            <input type="text" id="embarcacao" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="tanque">Tanque(s):</label>
+            <input type="text" id="tanque" required>
+        </div>
 
-    <div class="signature-container">
-        <label>Encarregado de Serviço:</label>
-        <canvas id="signaturePad2" class="signature-pad"></canvas>
-        <button onclick="clearSignature(2)">Limpar</button>
-    </div>
+        <!-- Foto do Cadeado -->
+        <div class="form-group">
+            <label for="fotoCadeado">Foto do Cadeado de Bloqueio:</label>
+            <input type="file" id="fotoCadeado" accept="image/*" capture="environment">
+            <img id="photoPreview">
+        </div>
 
-    <div class="signature-container">
-        <label>Coordenador Navship:</label>
-        <canvas id="signaturePad3" class="signature-pad"></canvas>
-        <button onclick="clearSignature(3)">Limpar</button>
-    </div>
+        <!-- Observações -->
+        <div class="form-group">
+            <label for="observacoes">Observações:</label>
+            <textarea id="observacoes" rows="3"></textarea>
+        </div>
 
-    <!-- Carrega as bibliotecas -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+        <!-- 3 Áreas de Assinatura -->
+        <div class="form-group signature-container">
+            <label>Chefe de Máquina:</label>
+            <canvas id="signaturePad1" class="signature-pad"></canvas>
+            <button type="button" class="clear-btn" onclick="clearSignature(1)">Limpar Assinatura</button>
+        </div>
+        
+        <div class="form-group signature-container">
+            <label>Encarregado de Serviço:</label>
+            <canvas id="signaturePad2" class="signature-pad"></canvas>
+            <button type="button" class="clear-btn" onclick="clearSignature(2)">Limpar Assinatura</button>
+        </div>
+        
+        <div class="form-group signature-container">
+            <label>Coordenador Navship:</label>
+            <canvas id="signaturePad3" class="signature-pad"></canvas>
+            <button type="button" class="clear-btn" onclick="clearSignature(3)">Limpar Assinatura</button>
+        </div>
+
+        <button type="button" onclick="gerarPDF()">GERAR PDF</button>
+    </form>
+
+    <!-- Bibliotecas Externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
